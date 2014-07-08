@@ -1,0 +1,42 @@
+#================================================================--
+# File Name    : Record/Verification/Nic/tb.cew
+#
+# Purpose      : unit testing
+#
+# Author       : Peter Walsh, Vancouver Island University
+#
+# System       : Perl (Linux)
+#
+#================================================================--
+
+$| = 1;
+use strict;
+use warnings;
+
+include(cew.pl)
+
+use lib '../../../';
+use Exc::Exception;
+use Record::Nic;
+use Try::Tiny;
+
+cew_Variables
+
+sub leaveScript {
+   cew_Summary
+   print("Bye\n");
+   exit(0);
+}
+
+$SIG{INT} = sub {leaveScript();};
+
+my $x = Record::Nic->new();
+$x->set_type('ethernet');
+$x->enqueue_packet("Peter");
+
+cew_Ncase(, $x->get_type(), 'ethernet')
+$x->enqueue_packet_fragment($x->dequeue_packet_fragment(10));
+my $exp = $x->dequeue_packet();
+cew_Ncase(, $exp, 'Peter')
+
+cew_Summary

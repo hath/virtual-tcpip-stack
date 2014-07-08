@@ -1,0 +1,180 @@
+		CSCI 460 Virtual internet  Base System
+                +++++++++++++++++++++++++  +++++++++++
+
+Last Updated: Wed Feb  5 10:14:11 PST 2014
+
+Preamble
+========
+
+IP address is a dot-decimal string containing 4 8-bit decimal numbers
+   e.g.,  "192.168.18.21" (note, numbers may not contain leading 0s).
+Host id. is a string  containing 1 8-bit decimal number e.g., "21".
+Network id. is a dot-decimal string containing 3 8-bit decimal numbers
+   e.g.,  "192.168.18".
+Port address is an  integer string e.g., "23".
+Mac address is an  integer string e.g., "7071".
+Mac broadcast address is "0".
+Valid values for a ethernet proto field are {"IP", "ARP"}.
+Valid values for an ip  proto field are {"TCP", "UDP", "ICMP"}.
+Valid values for an arp  opcode field are {"REQUEST", "REPLY"}.
+Valid values for icmp type field  are {"ECHO", "ECHO_REPLY", "INFO_REPLY"}
+Valid values for generic direction field  are {"UP", "DOWN"}
+
+Network Assignments
+===================
+
+Virtual LAN		Virtual Hub Port Numbers	
+-----------  		------------------------
+"192.168.0.0/24"	x070-x073
+"192.168.1.0/24"	x074-x077
+"192.168.2.0/24"	x078-x081
+"192.168.3.0/24"	x082-x085
+"192.168.4.0/24"	x086-x089
+"192.168.5.0/24"	x090-x093
+"192.168.6.0/24"	x094-x097
+"192.168.7.0/24"	x098-x101
+"192.168.8.0/24"	x102-x105
+"192.168.9.0/24"	x106-x109
+"192.168.10.0/24"	x110-x113
+"192.168.11.0/24"	x114-x117
+"192.168.12.0/24"	x118-x121
+"192.168.13.0/24"	x122-x125
+"192.168.14.0/24"	x126-x129
+"192.168.15.0/24"	x130-x133
+
+x=5 for Wed 9:00am	x=6 for Thur 10:30am
+
+Each virtual LAN has 4 virtual hub ports for a maximum of 4 hosts
+per virtual LAN.
+
+Virtual hub behaviour and ports are emulated using real TCP ports
+192.168.18.21:5070-5133 (Wed) and 192.168.18.21:6070-6133 (Thurs). 
+
+Virtual Point-to-Point Connection		Virtual P2P Port Numbers
+---------------------------------		------------------------
+"10.0.0.100" <--> "10.0.0.200"			y000 <--> y001
+"10.0.1.100" <--> "10.0.1.200"			y002 <--> y003
+"10.0.2.100" <--> "10.0.2.200"			y004 <--> y005
+"10.0.3.100" <--> "10.0.3.200"			y006 <--> y007
+"10.0.4.100" <--> "10.0.4.200"			y008 <--> y009
+"10.0.5.100" <--> "10.0.5.200"			y010 <--> y011
+"10.0.6.100" <--> "10.0.6.200"			y012 <--> y013
+"10.0.7.100" <--> "10.0.7.200"			y014 <--> y015
+"10.0.8.100" <--> "10.0.8.200"			y016 <--> y017
+"10.0.9.100" <--> "10.0.9.200"			y018 <--> y019
+"10.0.10.100" <--> "10.0.10.200"		y020 <--> y021
+"10.0.11.100" <--> "10.0.11.200"		y022 <--> y023
+"10.0.12.100" <--> "10.0.12.200"		y024 <--> y025
+"10.0.13.100" <--> "10.0.13.200"		y026 <--> y027
+"10.0.14.100" <--> "10.0.14.200"		y028 <--> y029
+"10.0.15.100" <--> "10.0.15.200"		y030 <--> y031
+"10.0.16.100" <--> "10.0.16.200"		y032 <--> y033
+"10.0.17.100" <--> "10.0.17.200"		y034 <--> y035
+"10.0.18.100" <--> "10.0.18.200"		y036 <--> y037
+"10.0.19.100" <--> "10.0.19.200"		y038 <--> y039
+"10.0.20.100" <--> "10.0.20.200"		y040 <--> y041
+"10.0.21.100" <--> "10.0.21.200"		y042 <--> y043
+"10.0.22.100" <--> "10.0.22.200"		y044 <--> y045
+"10.0.23.100" <--> "10.0.23.200"		y046 <--> y047
+"10.0.24.100" <--> "10.0.24.200"		y048 <--> y049
+"10.0.25.100" <--> "10.0.25.200"		y050 <--> y051
+"10.0.26.100" <--> "10.0.26.200"		y052 <--> y053
+"10.0.27.100" <--> "10.0.27.200"		y054 <--> y055
+"10.0.28.100" <--> "10.0.28.200"		y056 <--> y057
+"10.0.29.100" <--> "10.0.29.200"		y058 <--> y059
+"10.0.30.100" <--> "10.0.30.200"		y060 <--> y061
+"10.0.31.100" <--> "10.0.31.200"		y062 <--> y063
+
+y=7 for Wed 9:00am	y=8 for Thur 10:30am
+
+Each point-to-point connection has 2 virtual P2P ports.
+
+Virtual P2P behaviour and ports are emulated using real TCP ports
+192.168.18.21:7000-7063 (Wed) and 192.168.18.21:8000-8063 (Thurs).
+
+Static MAC Assignments
+======================
+
+IP Address		MAC
+------------		---
+192.168.x.y		(x * 100) + y
+
+ICMP SERVICES
+=============
+Name(port)		Payload In		Payload Out
+----			----------		-----------
+pingd(30)		(fload) time 		(float) time
+
+UDP Services
+============
+
+Name(port)		Payload In		Payload Out
+----			----------		-----------
+incd(40)		(int) val		(int) incremented val
+
+guessd(50)		(int) val		(string) guess result
+
+Behaviour incd
+--------------
+if a client on "192.168.5.3" sends val==23 to incd at "192.168.5.51":"40",
+then incd should return val==24 to the client.
+
+Behaviour guessd
+----------------
+guessd manages a number guessing game.  Clients must register with the
+server to play the game.  A client's first interaction with guessd is
+viewed as registration and subsequently, the client is prompted to guess
+a number between 1 and 100.
+
+Any unsolicited guesses are dropped (with the exception of the
+registration guess). 
+
+The result of a guess is sent to all registered clients with an indication
+of guess "goodness".
+
+A val==0 guess indicates a client wants to leave the game.
+
+New games are started with no registered clients.
+
+Tools
+=====
+hubSniffer.pl captures packets from a virtual hub port. It is
+a simple host and may be used on a virtual LAN at any time.
+
+hubServer.pl implements virtual hubs each one with 4 ports.
+
+p2pServer.pl implements  point-to-point connections.
+
+base.pl implements the base tcp/ip stacks for a single LAN. If a client
+requests a service that is not yet implemented that an icmp information
+packet is  returned to the requesting client.
+
+Packing and Framing
+===================
+
+Module		Packing/Framing Character(s)
+------		----------------------------
+Ethernet.pm 	chr(0xde)
+Udp.pm		chr(0xdd)
+Ip.pm		chr(0xdc)
+Arp.pm		chr(0xdf)
+Icmp.pm		chr(0xda)
+Generic.pm	chr(0xd9)
+Wire.pm		ESC-0xdb and END=0xc0 from SLIP
+
+Base System Boot and Menu
+=========================
+
+perl base.pl executes the boot menu/options and then executes 
+the system shell as exemplified below:
+
+> help
+COMMAND			BEHAVIOUR
+help			display help message 
+system			display system information
+ping ip			ping
+guess ip:val		play the guess game
+increment ip:val	request increment service
+quit			shutdown
+> 
+

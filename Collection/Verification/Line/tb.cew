@@ -1,0 +1,132 @@
+#================================================================--
+# File Name    : Collection/Verification/Line/tb.cew
+#
+# Purpose      : unit testing
+#
+# Author       : Peter Walsh, Vancouver Island University
+#
+# System       : Perl (Linux)
+#
+#================================================================--
+
+$|=1;
+use strict;
+use warnings;
+
+include(cew.pl)
+
+use lib '../../../';
+use Collection::Line;
+use Exc::Exception;
+use Try::Tiny;
+use AnyEvent;
+
+my $END=chr(0xc0);
+my $ESC=chr(0xdb);
+
+cew_Variables
+
+sub leaveScript {
+   cew_Summary
+   print("Bye\n");
+   exit(0);
+}
+
+$SIG{INT} = sub {leaveScript();};
+
+########
+# Part A
+########
+
+my $x = Collection::Line->new(maxbuff => 11);
+cew_Ecase($x->enqueue_packet('AAAAAAAAAA'), "fullbuff")
+
+#default outbuff size
+$x = Collection::Line->new();
+cew_Ecase($x->enqueue_packet('A'x999), "fullbuff")
+
+$x = Collection::Line->new(maxbuff => 9);
+cew_Ecase($x->enqueue_packet_fragment('AAAAAAAAAA'), "fullbuff")
+
+#default inbuff size
+$x = Collection::Line->new();
+cew_Ecase($x->enqueue_packet_fragment('A'x1001), "fullbuff")
+
+########
+# Part B
+########
+
+# One enqueued entity .. Good framing
+
+$x = Collection::Line->new();
+cew_Ncase(, $x->get_inbuff_size(), 0);
+cew_Ncase(, $x->get_outbuff_size(), 0);
+cew_Ncase(, $x->dequeue_packet(), undef);
+cew_Ncase(, $x->dequeue_packet_fragment(1), undef)
+
+$x->enqueue_packet_fragment($ESC . ('A'x8) . $END);
+cew_Ncase(, $x->dequeue_packet(), ('A'x8))
+$x->enqueue_packet('A'x8);
+cew_Ncase(, $x->dequeue_packet_fragment(10), $ESC. ('A'x8) .$END)
+
+# One enqueued entity .. Bad framing
+
+# Two enqueued entities .. Good framing
+
+$x = Collection::Line->new();
+$x->enqueue_packet_fragment($ESC . ('A'x8) . $END);
+cew_Ncase(, $x->get_inbuff_size(), 10);
+$x->enqueue_packet_fragment($ESC . ('B'x8) . $END);
+cew_Ncase(, $x->get_inbuff_size(), 20);
+
+cew_Ncase(, $x->dequeue_packet(), ('A'x8))
+cew_Ncase(, $x->get_inbuff_size(), 10);
+cew_Ncase(, $x->dequeue_packet(), ('B'x8))
+cew_Ncase(, $x->get_inbuff_size(), 0);
+$x->enqueue_packet('A'x8);
+cew_Ncase(, $x->get_outbuff_size(), 10);
+$x->enqueue_packet('B'x8);
+cew_Ncase(, $x->get_outbuff_size(), 20);
+cew_Ncase(, $x->dequeue_packet_fragment(10), $ESC. ('A'x8) .$END)
+cew_Ncase(, $x->get_outbuff_size(), 10);
+cew_Ncase(, $x->dequeue_packet_fragment(10), $ESC. ('B'x8) .$END)
+cew_Ncase(, $x->get_outbuff_size(), 0);
+
+# Two enqueued entities .. Bad framing
+
+########
+# Part C
+########
+
+my $z_event;
+my $f_event;
+my $g_event;
+
+#begin implicit while (1) event loop ++++++++
+$z_event = AnyEvent->condvar;
+
+my $etime=0;
+my $stress_time=12;
+
+$f_event = AnyEvent->timer (after => 1,
+   interval => 5,
+   cb => sub {
+      $etime++;
+      print("Stress test time remaining: ", 5*($stress_time-$etime), " seconds \n");
+      if ($etime==$stress_time) {
+         leaveScript();
+       }
+                  
+   }
+);
+
+$g_event = AnyEvent->timer (after => 1,
+   interval => 20,
+   cb => sub {
+      cew_Ncase(, 0, 0)
+   }
+);
+
+#end implicit while (1) event loop ++++++++
+$z_event->recv;
+

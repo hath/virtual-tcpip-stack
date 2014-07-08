@@ -1,0 +1,44 @@
+
+ping a host the local LAN (not localhost).
+Note: complete packet enqueueing and dequeueing is not
+considered.
+
+########
+# DOWN #
+########
+
+STDIN:
+read "ping 192.168.6.2" from stdin.
+set generic packet destination ip to 192.168.6.2.
+enqueue generic packet on ping queue.
+PING:
+set generic packet msg to 'ECHO:time_stamp'.
+enqueue generic packet on icmp queue.
+ICMP:
+set icmp packet type to 'ECHO'. 
+set icmp packet msg to time_stamp.
+set generic packet msg to icmp packet.
+enqueue generic packet on ip queue.
+IP:
+determine destination interface from destination ip.
+set generic packet interface to destination interface.
+determine interface ip from destination interface.
+set generic packet destination ip to interface ip.
+set ip packet source ip to interface ip.
+set ip packet destination ip to interface ip.
+set ip packet  proto to 'ICMP'
+set ip packet msg to generic packet msg.
+enqueue generic packet on ethernet queue.
+ETHERNET:
+determine source  mac address from generic packet source ip.
+determine destination mac address from generic packet destination ip.
+set ethernet packet source mac to source mac.
+set ethernet packet destination mac to destination mac.
+set ethernet packet proto to 'ICMP'.
+set ethernet packet msg to generic packet msg.
+enqueue ethernet packet on interface queue.
+
+######
+# UP #
+######
+

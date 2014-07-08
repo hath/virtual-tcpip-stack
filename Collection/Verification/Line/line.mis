@@ -1,0 +1,64 @@
+Line Interface Specification
+
+Exceptions
+----------
+               fullbuff    
+
+Class Method new
+----------------
+Inputs: optional (scalar) maxbuff size
+Exceptions: none
+Behaviour: create a  line instance with state
+               maxbuff # instance scalar variable: max size of inbuff 
+                       # and outbuff (default 100)
+               inbuff  # instance array variable: FIFO queue 
+               outbuff # instance array variable: FIFO queue 
+Outputs: returns a reference to a line instance
+
+Instance Method enqueue_packet 
+------------------------------
+Inputs: (scalar) packet
+Exceptions: if |outbuff| + packet size  + 2 > maxbuff then throw fullbuff
+Behaviour: frame the packet and enqueue it on outbuff
+Outputs: none
+
+Instance Method dequeue_packet
+------------------------------
+Inputs: none
+Exceptions: none
+Behaviour/Outputs: if a framed packet exists in inbuff then
+                      dequeue framed packet, remove the
+                      frame and return the packet
+                   else
+                      return undef
+   
+Instance Method enqueue_packet_fragment
+---------------------------------------
+Inputs: (scalar) framed packet fragment
+Exceptions: if |inbuff| + |framed packet fragment| > maxbuff then 
+               throw fullbuff
+Behaviour: enqueue the fragment on inbuff
+Outputs: none
+   
+Instance Method dequeue_packet_fragment
+---------------------------------------
+Inputs: (scalar) size
+Exceptions: none
+Behaviour/Outputs: if |outbuff| >= size
+                      dequeue a framed packed fragment from outbuff 
+                      return fragment where |fragment| == size
+                   else if |outbuff| > 0   
+                      dequeue a framed packed fragment from outbuff 
+                      return fragment where 
+                      |fragment| == |outbuff| before dequeue
+                   else 
+                      return undef
+
+Assumptions/Notes:
+
+To frame a packet, pre-pend the character $ESC and post-pend the character
+$END to the packet.  To remove a frame, remove $ESC and $END from a framed
+packet.  $ESC and $END are only used for framing and never appear within
+a valid packet.
+
+See line_tst.pl for examples of method invocation.
